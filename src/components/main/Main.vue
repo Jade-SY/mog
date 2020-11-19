@@ -1,5 +1,6 @@
 <template>
   <div class="contents-wrap main">
+    <popular-hashtags></popular-hashtags>
     <p class="main-title ma-0">모두가 그리는 한 컷 MoG!</p>
     <p class="text-h6">지금 그리고 싶은 것이 있나요?</p>
     <v-row justify="center">
@@ -21,8 +22,8 @@
         >
           캔버스 닫기
         </v-btn>
-        <v-card light>
-          <canvas-area></canvas-area>
+        <v-card class="pa-4" max-width="800" light color="#fbf9fa">
+          <canvas-area :myProfile="myProfile"></canvas-area>
         </v-card>
       </v-overlay>
     </v-row>
@@ -40,10 +41,11 @@ export default {
     };
   },
   components: {
+    PopularHashtags: () => import('@/components/main/PopularHashtags.vue'),
     CanvasArea: () => import('@/components/canvas/Canvas.vue'),
     GalleryWrap: () => import('@/components/gallery/Gallery.vue'),
   },
-  computed: { ...mapState(['posts']) },
+  computed: { ...mapState(['myProfile', 'posts']) },
 };
 </script>
 
@@ -54,7 +56,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 200px auto 0;
+  margin: 100px auto 0;
   .main-title {
     font-size: 2.5rem;
     font-weight: 400;

@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar fixed color="transparent" elevate-on-scroll elevation="1">
+  <v-app-bar fixed color="#ffffff" elevate-on-scroll elevation="1">
     <v-row no-gutters justify="space-between" align="center">
       <div class="left-wrap">
         <h1 class="logo mr-2">

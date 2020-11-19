@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row class="canvas-wrap" justify="space-between">
-      <div>
+      <v-col cols="5">
         <canvas
           class="mogCanvas"
           ref="canvas"
@@ -15,52 +15,62 @@
           justify="space-around"
           no-gutters="no-gutters"
         >
-          <v-btn icon="icon" class="controls-btn jsmode" @click="brushMode">
+          <v-btn icon="icon" class="controls-btn mogBrush" @click="brushMode">
             <v-icon>mdi-brush</v-icon>
           </v-btn>
-          <v-btn icon="icon" class="controls-btn jsmode" @click="fillMode">
+          <v-btn icon="icon" class="controls-btn mogFill" @click="fillMode">
             <v-icon>mdi-format-color-fill</v-icon>
           </v-btn>
-          <v-btn icon="icon" class="controls-btn jsEraser" @click="eraserMode">
+          <v-btn icon="icon" class="controls-btn mogEraser" @click="eraserMode">
             <v-icon>mdi-eraser</v-icon>
           </v-btn>
+          <span class="text-caption">{{ brushSizeValue.min }}</span>
           <input
-            class="jsRange"
+            class="mogRange"
             type="range"
-            min="1"
-            max="10.0"
-            value="2.5"
+            :min="brushSizeValue.min"
+            :max="brushSizeValue.max"
+            value="1"
             step="1"
+            @input="brushResize"
           />
+          <span class="text-caption">{{ brushSizeValue.max }}</span>
           <v-btn
-            class="controls-btns jsClear"
-            rounded="rounded"
+            class="controls-btns mogClear font-weight-bold pa-1"
+            title="전체 지우기"
+            text
+            color="error"
             @click="clearAll"
             >전체 지우기</v-btn
           >
         </v-row>
-      </div>
-      <div>
-        <v-color-picker
-          dot-size="25"
-          hide-inputs="hide-inputs"
-          @click="changeColor"
-        ></v-color-picker>
-        <v-btn class="controls-btns jsSave">올리기</v-btn>
-      </div>
+      </v-col>
+      <v-col cols="5">
+        <v-color-picker dot-size="20" @input="changeColor"></v-color-picker>
+      </v-col>
     </v-row>
+    <canvas-text :myProfile="myProfile"></canvas-text>
   </v-container>
 </template>
 
 <script>
 export default {
   name: 'CanvasArea',
+  props: ['myProfile'],
+  components: {
+    CanvasText: () => import('@/components/canvas/CanvasText.vue'),
+  },
   data() {
     return {
+      brushSizeValue: {
+        min: 1,
+        max: 10,
+      },
       isPainting: false,
       isFillMode: false,
       canvas: '',
       ctx: '',
+      brushSize: 1,
       selectedColor: '#2b2b2b',
     };
   },
@@ -77,7 +87,7 @@ export default {
       // console.log(x, y, this.ctx, this.canvas);
       this.ctx.strokeStyle = this.selectedColor;
       this.ctx.fillStyle = this.selectedColor;
-      this.ctx.lineWidth = 2.5;
+      this.ctx.lineWidth = this.brushSize;
       if (this.isPainting) {
         this.ctx.lineTo(x, y);
         this.ctx.stroke();
@@ -86,7 +96,12 @@ export default {
         this.ctx.moveTo(x, y);
       }
     },
-    changeColor() {},
+    changeColor(e) {
+      this.selectedColor = e.hexa;
+    },
+    brushResize(e) {
+      this.brushSize = e.target.value;
+    },
     brushMode() {
       this.isFillMode = false;
     },
@@ -94,13 +109,14 @@ export default {
       this.isFillMode = true;
     },
     eraserMode() {
-      if (this.isFillMode) {
-        this.isFillMode = false;
-        this.ctx.strokeStyle = '#fff';
+      if (!this.isFillMode) {
+        this.selectedColor = '#ffffff';
       } else {
-        this.ctx.strokeStyle = '#fff';
+        this.isFillMode = false;
+        this.selectedColor = '#ffffff';
       }
     },
+
     fillCanvas() {
       if (this.isFillMode) {
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -123,7 +139,6 @@ export default {
 <style lang="scss" scoped="scoped">
 .canvas-wrap {
   min-width: 420px;
-  max-width: 860px;
   margin: 0 auto;
 }
 .mogCanvas {
@@ -134,6 +149,12 @@ export default {
   영역값 지정은 js가 담당하는 것. js쪽에 사이즈 미지정시 이상하게 움직임*/
   background-color: #fff;
   border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(110, 110, 145, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.tool-set {
+  width: 400px;
+}
+.v-color-picker {
   box-shadow: 0 4px 6px rgba(110, 110, 145, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 </style>
